@@ -38,6 +38,23 @@ public class LeetCode19 {
         slow.next = slow.next.next;
         return head;
     }
+
+    public ListNode removeNthFromEnd2(ListNode head, int n) {
+
+        ListNode fHead = new ListNode(0);
+        ListNode fast = fHead, slow = fHead;
+        fHead.next = head;
+        while(n-- != 0) {
+            fast = fast.next;
+        }
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
+        return fHead.next;
+
+    }
 }
 
 
