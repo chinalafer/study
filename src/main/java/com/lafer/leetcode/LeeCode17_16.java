@@ -1,4 +1,4 @@
-package com.lafer.study;
+package com.lafer.leetcode;
 
 /**
  * 一个有名的按摩师会收到源源不断的预约请求，每个预约都可以选择接或不接。在每次预约服务之间要有休息时间，因此她不能接受相邻的预约。

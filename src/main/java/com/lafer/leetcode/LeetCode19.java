@@ -1,6 +1,4 @@
-package com.lafer.study;
-
-import com.sun.xml.internal.org.jvnet.fastinfoset.FastInfosetException;
+package com.lafer.leetcode;
 
 /**
  * 给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。

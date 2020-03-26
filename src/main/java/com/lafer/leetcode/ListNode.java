@@ -1,4 +1,4 @@
-package com.lafer.study;
+package com.lafer.leetcode;
 
 class ListNode {
     int val;

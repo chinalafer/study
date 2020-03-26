@@ -1,4 +1,4 @@
-package com.lafer.study;
+package com.lafer.leetcode;
 
 import java.util.ArrayList;
 import java.util.List;

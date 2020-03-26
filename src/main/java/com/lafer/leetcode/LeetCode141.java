@@ -1,4 +1,4 @@
-package com.lafer.study;
+package com.lafer.leetcode;
 
 /**
  * 给定一个链表，判断链表中是否有环。
