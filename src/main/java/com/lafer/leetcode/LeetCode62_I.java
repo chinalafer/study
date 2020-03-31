@@ -8,9 +8,11 @@ import java.util.ArrayList;
  * 例如，0、1、2、3、4这5个数字组成一个圆圈，从数字0开始每次删除第3个数字，则删除的前4个数字依次是2、0、4、1，因此最后剩下的数字是3。
  *
  * 思考：模拟法（使用ArrayList）
+ * 题解中的数学方法：约瑟夫环问题
+ *
  */
 
-public class LeetCode60 {
+public class LeetCode62_I {
 
     public static void main(String[] args) {
         System.out.println(lastRemaining(5, 3));
@@ -27,6 +29,14 @@ public class LeetCode60 {
             arrayList.remove(index);
         }
         return arrayList.get(0);
+    }
+
+    public static int lastRemaining2(int n, int m) {
+        int res = 0;
+        for (int i = 2; i <= n; i++) {
+            res = (res + m) % i;
+        }
+        return res;
     }
 
 }
