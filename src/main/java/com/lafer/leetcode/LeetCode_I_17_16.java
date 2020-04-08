@@ -11,7 +11,7 @@ package com.lafer.leetcode;
  *
  */
 
-public class LeeCode17_16 {
+public class LeetCode_I_17_16 {
 
     public static void main(String[] args) {
         massage1(new int[]{2, 1, 1, 2});

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  */
 
-public class LeetCode62_I {
+public class LeetCode_I_62 {
 
     public static void main(String[] args) {
         System.out.println(lastRemaining(5, 3));
