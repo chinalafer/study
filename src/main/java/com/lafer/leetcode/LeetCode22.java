@@ -19,6 +19,7 @@ import java.util.List;
  *        "()()()"
  *      ]
  *
+ * 思考：DFS深度优先遍历
  *
  */
 
@@ -27,25 +28,19 @@ public class LeetCode22 {
     List<String> result = new ArrayList<>();
 
     public List<String> generateParenthesis(int n) {
-        DFS(new StringBuilder(), n, n);
+        DFS("", n, n);
         return result;
     }
 
-    private void DFS(StringBuilder sb, int z, int y) {
-        if (z < 0 || y < 0) {
+    private void DFS(String sb, int z, int y) {
+        if (z < 0 || y < 0 || z > y) {
             return;
         }
         if (z == 0 && y == 0) {
             result.add(sb.toString());
         }
-        if (z > y) {
-            return;
-        } else {
-            StringBuilder temp1 = new StringBuilder(sb);
-            DFS(temp1.append("("), z - 1, y);
-            StringBuilder temp = new StringBuilder(sb);
-            DFS(temp.append(")"), z, y - 1);
-        }
+        DFS(sb + "(", z - 1, y);
+        DFS(sb + ")", z, y - 1);
     }
 
 }

@@ -42,7 +42,7 @@ package com.lafer.leetcode;
  *
  */
 
-public class LeetCode01_07 {
+public class LeetCode_I_01_07 {
 
     public void rotate(int[][] matrix) {
         int n = matrix.length;
