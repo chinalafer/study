@@ -21,16 +21,33 @@ import java.util.List;
 
 public class LeetCode93 {
 
-    public static void main(String[] args) {
-        restoreIpAddresses("255255255255");
+    public List<String> restoreIpAddresses(String s) {
+        List<String> result = new ArrayList<>();
+        DFS(s, 1, new StringBuilder(), result);
+        return result;
     }
 
-    public static List<String> restoreIpAddresses(String s) {
-        return null;
-    }
-
-    private static void DFS(String s, int index, String re, List<String> result) {
-
+    private void DFS(String s, int index, StringBuilder re, List<String> result) {
+        if (index == 5 || s.length() == 0) {
+            if (index == 5 && s.length() == 0) {
+                result.add(re.toString());
+            }
+            return;
+        }
+        for (int i = 1; i <= 3 && i <= s.length(); i++) {
+            if (i != 1 && s.startsWith("0")) {
+                break;
+            }
+            String part = s.substring(0, i);
+            if (Integer.parseInt(part) <= 255) {
+                if (index != 1) {
+                    part = "." + part;
+                }
+                re.append(part);
+                DFS(s.substring(i), index + 1, re, result);
+                re.delete(re.length() - part.length(), re.length());
+            }
+        }
     }
 
 }
