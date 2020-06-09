@@ -1,4 +1,6 @@
-package com.lafer.leetcode;
+package com.lafer.leetcode.list;
+
+import com.lafer.leetcode.ListNode;
 
 /**
  * 编写一个程序，找到两个单链表相交的起始节点。

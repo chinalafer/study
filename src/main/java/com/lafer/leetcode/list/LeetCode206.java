@@ -1,4 +1,6 @@
-package com.lafer.leetcode;
+package com.lafer.leetcode.list;
+
+import com.lafer.leetcode.ListNode;
 
 /**
  *

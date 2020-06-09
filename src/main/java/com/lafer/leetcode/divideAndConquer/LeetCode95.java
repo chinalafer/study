@@ -60,7 +60,7 @@ public class LeetCode95 {
         return list;
     }
 
-    public class TreeNode {
+    class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
