@@ -37,7 +37,8 @@ import java.util.Queue;
  * 7
  *
  * 思考：
- * dfs（右子树先入队列）
+ * bfs（右子树先入队列）
+ * dfs
  *
  */
 
@@ -56,6 +57,26 @@ public class LeetCode513 {
             }
         }
         return root.val;
+    }
+
+    int re;
+    int maxDeep = 0;
+
+    public int findBottomLeftValue1(TreeNode root) {
+        dfs(root, 1);
+        return re;
+    }
+
+    private void dfs(TreeNode root, int deep) {
+        if (root == null) {
+            return;
+        }
+        if (deep > maxDeep) {
+            maxDeep = deep;
+            re = root.val;
+        }
+        dfs(root.left, deep + 1);
+        dfs(root.right, deep + 1);
     }
 
 }
