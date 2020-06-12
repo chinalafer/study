@@ -25,10 +25,21 @@ import com.lafer.leetcode.TreeNode;
 
 public class LeetCode538 {
 
-    public TreeNode convertBST(TreeNode root) {
+    int sum = 0;
 
+    public TreeNode convertBST(TreeNode root) {
+        traver(root);
+        return root;
     }
 
-
+    private void traver(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        traver(root.right);
+        sum += root.val;
+        root.val = sum;
+        traver(root.left);
+    }
 
 }
