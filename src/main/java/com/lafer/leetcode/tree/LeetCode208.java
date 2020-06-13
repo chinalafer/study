@@ -1,4 +1,4 @@
-package com.lafer.leetcode;
+package com.lafer.leetcode.tree;
 
 /**
  *
