@@ -21,6 +21,9 @@ import com.lafer.leetcode.TreeNode;
  *             /   \
  *           20     13
  *
+ *
+ * 思考：中序遍历的相反遍历。
+ *
  */
 
 public class LeetCode538 {

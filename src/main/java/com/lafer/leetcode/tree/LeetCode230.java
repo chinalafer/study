@@ -82,4 +82,24 @@ public class LeetCode230 {
         return ret;
     }
 
+    public int kthSmallest2(TreeNode root, int k) {
+        int left = getNodeNums(root);
+        if (k == left + 1) {
+            return root.val;
+        } else if (k < left + 1) {
+            return kthSmallest2(root.left, k);
+        } else {
+            return kthSmallest2(root.right, k - (left + 1));
+        }
+    }
+
+    private int getNodeNums(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int left = getNodeNums(root.left);
+        int right = getNodeNums(root.right);
+        return 1 + left + right;
+    }
+
 }
