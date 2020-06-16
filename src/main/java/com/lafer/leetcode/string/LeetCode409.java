@@ -1,4 +1,4 @@
-package com.lafer.leetcode;
+package com.lafer.leetcode.string;
 
 /**
  * 给定一个包含大写字母和小写字母的字符串，找到通过这些字母构造成的最长的回文串。
@@ -22,11 +22,8 @@ public class LeetCode409 {
         }
         for (int i : count) {
             result += (i / 2) * 2;
-            if ((result & 1) == 0 && (i & 1) == 1) {
-                result++;
-            }
         }
-        return result;
+        return result == s.length() ? result : ++result;
     }
 
 }
