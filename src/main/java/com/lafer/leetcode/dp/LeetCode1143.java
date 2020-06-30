@@ -35,6 +35,14 @@ package com.lafer.leetcode.dp;
  * 1 <= text2.length <= 1000
  * 输入的字符串只含有小写英文字符。
  *
+ * 思考：
+ * 动态规划：
+ * 状态：定义一个二维数组dp[n + 1][m + 1],dp[i][j]表示text1前i个数与text2前j个数最长子序列的长度
+ * 状态转移：如果text[i] = text[j] 则 dp[i][j] = dp[i - 1][j - 1] + 1; 否则dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+ * 初始化：dp数组初始化为0
+ * 结果：dp[n][m]即为结果
+ * 状态压缩：由于只用到了dp[i - 1][j - 1]、dp[i - 1][j]、dp[i][j - 1]，可以使用一个一位数组进行保存状态即可。
+ *
  */
 
 public class LeetCode1143 {
@@ -56,4 +64,29 @@ public class LeetCode1143 {
         }
         return dp[n][m];
     }
+
+
+    public int longestCommonSubsequence1(String text1, String text2) {
+        if (text1 == null || text1.length() == 0 || text2 == null || text2.length() == 0) {
+            return 0;
+        }
+        int n = text1.length(), m = text2.length();
+        int[] dp = new int[m + 1];
+        int temp = 0;
+        for (int i = 1; i <= n; i++) {
+            char c1 = text1.charAt(i - 1);
+            int last = 0;
+            for (int j = 1; j <= m; j++) {
+                temp = dp[j];
+                if (c1 == text2.charAt(j - 1)) {
+                    dp[j] = last + 1;
+                } else {
+                    dp[j] = Math.max(dp[j], dp[j - 1]);
+                }
+                last = temp;
+            }
+        }
+        return dp[m];
+    }
+
 }

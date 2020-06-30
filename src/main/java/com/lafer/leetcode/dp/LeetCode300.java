@@ -1,6 +1,5 @@
 package com.lafer.leetcode.dp;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -27,9 +26,9 @@ import java.util.Arrays;
  * 动态规划优化：
  * 状态：定义一个tails数组，tails[i] 表示 长度为 i + 1 最长上升子序列的最后一个数的最小值。
  * 状态转移：
- * 遍历nums数组，不断更新tails数组中的值。
- * 1：如果nums[i] 大于tails最后一个数，直接加入到tails中，tails的长度 + 1
- * 2：其他情况，找到有序数组tails中第一个大于等于nums[i]的数并替换它（使用二分查找）
+ *  遍历nums数组，不断更新tails数组中的值。
+ *  1：如果nums[i] 大于tails最后一个数，直接加入到tails中，tails的长度 + 1
+ *  2：其他情况，找到有序数组tails中第一个大于等于nums[i]的数并替换它（使用二分查找）
  * 初始化：不需要，或者直接tails[0] = nums[0],len = 1;
  * 结果：tails的长度len
  * 状态压缩：因为要记录各个长度情况下的最后一个最小的数，没法进行状态压缩。
