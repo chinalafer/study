@@ -23,7 +23,7 @@ package com.lafer.leetcode.dp;
 public class LeetCode309 {
 
     public int maxProfit(int[] prices) {
-
+        return 0;
     }
 
 }
