@@ -1,6 +1,8 @@
 package com.lafer.leetcode.graph;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  *
@@ -71,5 +73,41 @@ public class LeetCode785 {
         return true;
     }
 
+
+    public boolean isBipartite1(int[][] graph) {
+        color = new int[graph.length];
+        for (int i = 0; i < graph.length; i++) {
+            if (color[i] == 0 && !bfs(graph, i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int[] color = null;
+    public boolean bfs(int[][] graph, int index) {
+        int expectColor = 1;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(index);
+        color[index] = expectColor;
+        while (!queue.isEmpty()) {
+            expectColor = -expectColor;
+            int size = queue.size();
+            while (size-- > 0) {
+                int po = queue.poll();
+                for (int next : graph[po]) {
+                    if (color[next] != expectColor) {
+                        if (color[next] != 0) {
+                            return false;
+                        } else {
+                            queue.add(next);
+                            color[next] = expectColor;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
 }
