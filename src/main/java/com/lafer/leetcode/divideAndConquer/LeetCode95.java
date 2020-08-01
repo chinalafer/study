@@ -2,6 +2,7 @@ package com.lafer.leetcode.divideAndConquer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 /**
  *
@@ -69,5 +70,4 @@ public class LeetCode95 {
             val = x;
         }
     }
-
 }
