@@ -170,3 +170,17 @@ NoSQL
 
 ### Linux安装
 
+1、官网下载最新的安装包`redis-6.0.6.tar.gz`
+
+2、解压   tar -zxvf redis-6.0.6.tar.gz
+
+3、进入解压后的文件，有一个redis.conf配置文件
+
+4、安装基本环境（因为redis是C语言编写的）
+
+```bash
+yum install gcc-c++
+make #在解压后的文件夹中
+```
+
+5、make
