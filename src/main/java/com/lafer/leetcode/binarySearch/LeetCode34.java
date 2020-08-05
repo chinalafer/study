@@ -52,4 +52,47 @@ public class LeetCode34 {
         return l;
     }
 
+    public int[] searchRange1(int[] nums, int target) {
+        if (nums == null || nums.length == 0) {
+            return new int[]{-1, -1};
+        }
+        return new int[]{searchLeft(nums, target), searchRight(nums, target)};
+    }
+
+    private int searchLeft(int[] nums, int target) {
+        int left = 0, right = nums.length;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > target) {
+                right = mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else if (nums[mid] == target) {
+                right = mid;
+            }
+        }
+        if (left == nums.length || nums[left] != target) {
+            return -1;
+        }
+        return left;
+    }
+
+    private int searchRight(int[] nums, int target) {
+        int left = 0, right = nums.length;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > target) {
+                right = mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else if (nums[mid] == target) {
+                left = mid + 1;
+            }
+        }
+        if (left == 0 || (nums[left - 1] != target)) {
+            return -1;
+        }
+        return left - 1;
+    }
+
 }
