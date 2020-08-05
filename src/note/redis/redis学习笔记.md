@@ -1,4 +1,10 @@
-## NoSQL概述
+127.0.0.1:6379> ZREM china:city shanghai
+(integer) 1
+127.0.0.1:6379> ZRANGE china:city 0 -1
+1) "lanzhou"
+2) "changsha"
+3) "hangzhou"
+4) "beijin"NoSQL概述
 
 ### 为什么使用NoSQL
 
@@ -432,7 +438,7 @@ OK
 "1"
 ```
 
-### List
+### List（列表）
 
 基本数据类型列表
 
@@ -538,7 +544,7 @@ OK
 
 作为基本的数据结构之一，一切数据结构可分为两种，一种是链表，一种是数组。Redis中的List其实使用的一个双向链表，所以在两端插入和删除的效率高，根据下标进行的操作较慢
 
-### Set
+### Set（集合）
 
 ```bash
 127.0.0.1:6379> SPOP set1
@@ -608,5 +614,375 @@ OK
 3) "c++"
 4) "java"
 5) "redis"
+```
+
+### Hash（哈希）
+
+```bash
+127.0.0.1:6379> HSET myhash field1 lafer					#set一个具体的key-value
+(integer) 1
+127.0.0.1:6379> hget myhash field1							#get一个具体的key-value
+"lafer"
+127.0.0.1:6379> HMSET myhash field2 java field3 reids		#设置多个key-value
+OK
+127.0.0.1:6379> hget myhash field1
+"lafer"
+127.0.0.1:6379> hmget myhash field1 field1 field2 field3	#获取多个key-value
+1) "lafer"
+2) "lafer"
+3) "java"
+4) "reids"
+127.0.0.1:6379> HGETALL myhash								#获取全部的key-value
+1) "field1"
+2) "lafer"
+3) "field2"
+4) "java"
+5) "field3"
+6) "reids"
+127.0.0.1:6379> HDEL myhash field1							#删除指定的key
+(integer) 1
+127.0.0.1:6379> HGETALL myhash
+1) "field2"
+2) "java"
+3) "field3"
+4) "reids"
+127.0.0.1:6379> HLEN myhash									#获取hash的长度
+(integer) 2
+127.0.0.1:6379> HEXISTS myhash field2						#判断指定key是否存在
+(integer) 1
+127.0.0.1:6379> HEXISTS myhash filed1
+(integer) 0
+127.0.0.1:6379> HKEYS myhash								#获取所有的key
+1) "field2"
+2) "field3"
+127.0.0.1:6379> HVALS myhash								#获取所有的value
+1) "java"
+2) "reids"
+127.0.0.1:6379> hset myhash field1 10
+(integer) 1
+127.0.0.1:6379> HGETALL myhash		
+1) "field2"
+2) "java"
+3) "field3"
+4) "reids"
+5) "field1"
+6) "10"
+127.0.0.1:6379> HINCRBY myhash field1 1						#指定增量对指定value进行变更
+(integer) 11
+127.0.0.1:6379> HGETALL myhash
+1) "field2"
+2) "java"
+3) "field3"
+4) "reids"
+5) "field1"
+6) "11"
+127.0.0.1:6379> HSETNX myhash field4 value4					#如果不存在则设置成功
+(integer) 1
+127.0.0.1:6379> HSETNX myhash field4 value4					#如果存在设置不成功
+(integer) 0
+```
+
+hash 适合用于对象的存储，String更适合字符串存储
+
+### Zset（有序集合）
+
+```bash
+127.0.0.1:6379> ZADD myzset 1 one							#设置一个值
+(integer) 1
+127.0.0.1:6379> ZADD myzset 2 two 3 three					#设置多个值
+(integer) 2
+127.0.0.1:6379> ZRANGE myzset 0 -1							#获取所有值
+1) "one"
+2) "two"
+3) "three"
+127.0.0.1:6379> ZRANGEBYSCORE myzset -inf +inf				#从小到大排序
+1) "one"
+2) "two"
+3) "three"
+127.0.0.1:6379> ZRANGEBYSCORE myzset -inf +inf withscores	#从小到大排序，显示分数
+1) "one"
+2) "1"
+3) "two"
+4) "2"
+5) "three"
+6) "3"
+127.0.0.1:6379> ZRANGEBYSCORE myzset -inf 2 withscores		#从小到大排序，score小于等于2
+1) "one"
+2) "1"
+3) "two"
+4) "2"
+127.0.0.1:6379> ZRANGE myzset 0 -1
+1) "one"
+2) "two"
+3) "three"
+127.0.0.1:6379> ZREM myzset one								#移除zset中的指定元素，可多个
+(integer) 1
+127.0.0.1:6379> ZRANGE myzset 0 -1
+1) "two"
+2) "three"
+127.0.0.1:6379> zcard myzset								#获取zset中的元素个数
+(integer) 2
+127.0.0.1:6379> ZREVRANGE myzset 0 -1						#从大到小排序
+1) "three"
+2) "two"
+127.0.0.1:6379> zadd myzset 4 java 5 redis 6 c++ 7 c		
+(integer) 4
+127.0.0.1:6379> ZCOUNT myzset 3 5							#获取score区间的元素个数
+(integer) 3
+```
+
+案例思路：排行榜，班级分数排序等
+
+## 三种特殊数据类型
+
+### Geospatial
+
+```bash
+# geoadd 添加地理位置
+# 规则：两级无法直接添加，一般来说通过java程序一次性通过文件导入
+# 有效的经度从-180度到180度。
+# 有效的纬度从-85.05112878度到85.05112878度。
+# 当坐标位置超出上述指定范围时，该命令将会返回一个错误。
+127.0.0.1:6379> GEOADD china:city 116.23 40.22 beijin 120.21 30.20 hangzhou 121.48 31.40 shanghai 
+(integer) 3
+127.0.0.1:6379> GEOADD china:city 112.98 28.25 changsha 103.71 36.10 lanzhou
+(integer) 2
+# GEOPOS 获取对应位置的经纬度
+127.0.0.1:6379> GEOPOS china:city hangzhou lanzhou			
+1) 1) "120.21000176668167114"
+   2) "30.19999988833350102"
+2) 1) "103.71000140905380249"
+   2) "36.09999935873431554"
+# GEODIST 查看长沙到杭州的直线距离
+127.0.0.1:6379> GEODIST china:city changsha hangzhou km		
+"734.3851"
+# GEORADIUS 查看以指定经纬度为中心附近指定距离的元素
+127.0.0.1:6379> GEORADIUS china:city 110 33 1000 km			
+1) "lanzhou"
+2) "beijin"
+3) "changsha"
+127.0.0.1:6379> GEORADIUS china:city 110 33 1000 km withdist
+1) 1) "lanzhou"
+   2) "671.2809"
+2) 1) "beijin"
+   2) "976.2648"
+3) 1) "changsha"
+   2) "600.3157"
+127.0.0.1:6379> GEORADIUS china:city 110 33 1000 km withdist withcoord
+1) 1) "lanzhou"
+   2) "671.2809"
+   3) 1) "103.71000140905380249"
+      2) "36.09999935873431554"
+2) 1) "beijin"
+   2) "976.2648"
+   3) 1) "116.23000055551528931"
+      2) "40.2200010338739844"
+3) 1) "changsha"
+   2) "600.3157"
+   3) 1) "112.9800000786781311"
+      2) "28.25000087963665152"
+127.0.0.1:6379> GEORADIUS china:city 110 33 1000 km withdist withcoord count 1
+1) 1) "changsha"
+   2) "600.3157"
+   3) 1) "112.9800000786781311"
+      2) "28.25000087963665152"
+127.0.0.1:6379> GEORADIUS china:city 110 33 1000 km withdist withcoord count 2
+1) 1) "changsha"
+   2) "600.3157"
+   3) 1) "112.9800000786781311"
+      2) "28.25000087963665152"
+2) 1) "lanzhou"
+   2) "671.2809"
+   3) 1) "103.71000140905380249"
+      2) "36.09999935873431554"
+# GEORADIUSBYMEMBER 查看以指定元素为中心附近指定距离的元素
+127.0.0.1:6379> GEORADIUSBYMEMBER china:city hangzhou 1000 km			
+1) "changsha"
+2) "hangzhou"
+3) "shanghai"
+# geohash 该命令将返回11个字符的Geohash字符串，越相似距离越近
+127.0.0.1:6379> GEOHASH china:city shanghai hangzhou changsha beijin
+1) "wtw6sk5n300"
+2) "wtm7z3wrb00"
+3) "wt02dyv80v0"
+4) "wx4sucu47r0"
+```
+
+> Geospatial底层还是使用的zset,那么zset的命令一样适用
+
+```bash
+127.0.0.1:6379> ZREM china:city shanghai
+(integer) 1
+127.0.0.1:6379> ZRANGE china:city 0 -1
+1) "lanzhou"
+2) "changsha"
+3) "hangzhou"
+4) "beijin"
+```
+
+### HyperLogLogs
+
+基数统计的数据结构
+
+应用场景：网页的UV（一个人访问一个网站多次，但是还算作一个人）这种情况如果使用传统的set进行保存，但是用户id是没用的，内存消耗大，目的只是为了统计，而不是保存用户id。但是使用HyperLogLogs是有误差的，但是这种统计允许存在这种误差(0.81%的错误率)。
+
+优点：占用的内存是固定的，2^64不同的元素计数，只需要12KB内存！从内存角度来比较的话HyperLogLogs是首选。
+
+```bash
+127.0.0.1:6379> PFADD mykey2 a b c j k l m o p g d
+(integer) 1
+127.0.0.1:6379> pfadd mykey a b c d e f g h i
+(integer) 1
+127.0.0.1:6379> PFMERGE mykey3 mykey mykey2
+OK
+127.0.0.1:6379> PFCOUNT mykey3
+(integer) 15
+```
+
+### Bitmaps
+
+> 位存储
+
+统计用户信息：活跃，不活跃；登录，未登录；打卡，未打卡！两个状态的都可以使用Bitmaps!
+
+Bitmaps位图，操作二进制位进行记录，只有0和1两个状态！
+
+```bash
+# 设置指定位的 0 1 状态
+127.0.0.1:6379> SETBIT sign 0 0
+(integer) 0
+127.0.0.1:6379> SETBIT sign 1 1 
+(integer) 0
+127.0.0.1:6379> SETBIT sign 2 1
+(integer) 0
+127.0.0.1:6379> SETBIT sign 3 0
+(integer) 0
+127.0.0.1:6379> SETBIT sign 4 1
+(integer) 0
+127.0.0.1:6379> setbit sign 5 1
+(integer) 0
+127.0.0.1:6379> setbit sign 6 0
+127.0.0.1:6379> SETBIT sign 7 1
+(integer) 0
+127.0.0.1:6379> SETBIT sign  8 1
+(integer) 0
+127.0.0.1:6379> SETBIT sign  10 1
+(integer) 0
+127.0.0.1:6379> SETBIT sign  19 1
+(integer) 0
+# 获取指定位置上的bit
+127.0.0.1:6379> GETBIT sign 3
+(integer) 0
+127.0.0.1:6379> GETBIT sign 4
+(integer) 1
+# bitcount 统计的是字符串指定起始位置的字节数（统计字符串被设置为1的bit数.）
+127.0.0.1:6379> BITCOUNT sign 0 0				
+(integer) 5
+127.0.0.1:6379> BITCOUNT sign 0 1
+(integer) 7
+127.0.0.1:6379> BITCOUNT sign 1 2
+(integer) 3
+```
+
+## 事务
+
+Redis事务的本质：一组命令的集合！一个事务中的所有命令都会被序列化，在事务执行过程中，会按照顺序执行，一次性、顺序性、排他性！执行一系列的命令！
+
+```bash
+---- 队列 set set set 执行 ---
+```
+
+==Redis事务没有隔离级别的概念==
+
+所有的命令在事务中，并没有直接被执行，只有在发起执行命令的时候才会执行！exec
+
+==Redis单条命令是保证原子性的，但是事务不保证原子性==
+
+Redis的事务：
+
+- 开启事务（multi）
+- 命令入队（.......）
+- 执行事务（exec）
+
+> 正常执行
+
+```bash
+127.0.0.1:6379> multi					#开启事务
+OK
+#命令入队
+127.0.0.1:6379> set k1 v1
+QUEUED
+127.0.0.1:6379> set k2 v2
+QUEUED
+127.0.0.1:6379> get k2
+QUEUED
+127.0.0.1:6379> set k3 v3
+QUEUED
+127.0.0.1:6379> exec					#执行事务
+1) OK
+2) OK
+3) "v2"
+4) OK
+```
+
+> 放弃事务
+
+```bash
+127.0.0.1:6379> MULTI					#开启事务
+OK
+127.0.0.1:6379> set k1 v1
+QUEUED
+127.0.0.1:6379> set k4 v4
+QUEUED
+127.0.0.1:6379> DISCARD					#取消事务
+OK			
+127.0.0.1:6379> get k4					#事务队列中的命令都不会被执行
+(nil)
+```
+
+> 编译型异常（代码中有问题，命令有错！），事务中所有的命令都不会被执行！
+
+```bash
+127.0.0.1:6379> MULTI
+OK
+127.0.0.1:6379> set k4 v4
+QUEUED
+127.0.0.1:6379> gethash k2				#错误的命令
+(error) ERR unknown command `gethash`, with args beginning with: `k2`, 
+127.0.0.1:6379> set k5 v5
+QUEUED
+127.0.0.1:6379> EXEC					#执行事务报错
+(error) EXECABORT Transaction discarded because of previous errors.
+127.0.0.1:6379> get k4					#所有的命令都不会执行
+(nil)
+127.0.0.1:6379> get k5
+(nil)
+```
+
+> 运行时异常（1 / 0）, 如果事务队列中存在语法性错误，那么执行命令的时候，其他命令是可以正常执行的，错误命令抛出异常···
+
+```bash
+127.0.0.1:6379> MULTI
+OK
+127.0.0.1:6379> set k1 "v1"
+QUEUED
+# 执行的时候报错，不影响其他执行的执行，所以说Redis单个命令是保证原子性的，事务是不保证原子性的。
+127.0.0.1:6379> INCR k1				
+QUEUED
+127.0.0.1:6379> set k4 v4
+QUEUED
+127.0.0.1:6379> set k5 v5
+QUEUED
+127.0.0.1:6379> EXEC
+1) OK
+2) (error) ERR value is not an integer or out of range
+3) OK
+4) OK
+127.0.0.1:6379> get k4
+"v4"
+127.0.0.1:6379> get k5
+"v5"
+127.0.0.1:6379> get k1
+"v1"
 ```
 
