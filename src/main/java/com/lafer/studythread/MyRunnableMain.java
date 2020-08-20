@@ -6,7 +6,7 @@ public class MyRunnableMain {
         MyRunnable myRunnable = new MyRunnable();
 
         Thread thread = new Thread(myRunnable, "lafer");
-
+        new Thread(myRunnable, "test1").start();
         thread.start();
 
 
