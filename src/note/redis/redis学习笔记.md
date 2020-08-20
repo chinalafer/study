@@ -10,7 +10,7 @@
 
 > 单机MySQL年代
 
-![1596267189346](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/1596267189346.png)
+![1596267189346](https://gitee.com/lafer/laferImage/raw/master/img/1596267189346.png)
 
 网站的访问量不大，单个数据完全够用。
 
@@ -26,7 +26,7 @@
 
 网站80%的情况都是在读，使用缓存来减少重复读，保证效率降低mysql的压力
 
-![1596267508787](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/1596267508787.png)
+![1596267508787](https://gitee.com/lafer/laferImage/raw/master/img/1596267508787.png)
 
 > 分库分表 + 水平拆分 + MySQL集群
 
@@ -38,7 +38,7 @@ Innodb：行锁
 
 使用分库分表解决写的压力。
 
-![1596268392475](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/1596268392475.png)
+![1596268392475](https://gitee.com/lafer/laferImage/raw/master/img/1596268392475.png)
 
 > 最近的年代
 
@@ -46,7 +46,7 @@ Innodb：行锁
 
 **目前一个基本的互联网项目**
 
-![1596269510606](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/1596269510606.png)
+![1596269510606](https://gitee.com/lafer/laferImage/raw/master/img/1596269510606.png)
 
 **为什么使用NoSQL**
 
@@ -138,7 +138,7 @@ NoSQL
 - 它存放的不是图形，而是关系，比如：朋友圈社交网络、广告推荐！
 - Neo4j，InfoGrid
 
-![1596272131424](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/1596272131424.png)
+![1596272131424](https://gitee.com/lafer/laferImage/raw/master/img/1596272131424.png)
 
 ## Redis入门
 
@@ -1205,9 +1205,9 @@ class RedisSpringbootApplicationTests {
 
 使用默认的RedisTemplate会使用JDK默认的序列化方式，在redis客户端会发生乱码，一般来说会使用Json序列化。
 
-![image-20200807233523012](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/image-20200807233523012.png)
+![image-20200807233523012](https://gitee.com/lafer/laferImage/raw/master/img/image-20200807233523012.png)
 
-![image-20200807233600604](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/image-20200807233600604.png)
+![image-20200807233600604](https://gitee.com/lafer/laferImage/raw/master/img/image-20200807233600604.png)
 
 定义自己的RedisTemplate
 
@@ -1380,7 +1380,7 @@ Redis是内存数据库，如果不将内存中的数据状态保存到磁盘，
 
 **RDB（Redis DataBase）**
 
-![image-20200808163612094](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/image-20200808163612094.png)
+![image-20200808163612094](https://gitee.com/lafer/laferImage/raw/master/img/image-20200808163612094.png)
 
 在指定的时间间隔内将内存中的数据集快照写入磁盘（SnapShot快照），它恢复时是将快照文件直接读到内存里。
 
@@ -1422,7 +1422,7 @@ Redis会单独创建（fork）一个子进程来进行持久化，会先将数�
 
 **AOF（Append Only File）**
 
-![image-20200808164215716](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/image-20200808164215716.png)
+![image-20200808164215716](https://gitee.com/lafer/laferImage/raw/master/img/image-20200808164215716.png)
 
 以日志的形式来记录每一个写操作，将Redis执行过的所有指令记录一下来（读操作不记录），只需追加文件但不可以改写文件，redis启动之初会读取该文件重新构建数据（redis重启的话就根据日志文件的内容将写指令从前到后执行一次以完成数据的恢复工作）
 
@@ -1479,11 +1479,11 @@ Redis客户端可以订阅任意数量的频道
 
 下图展示了频道 channel1 ， 以及订阅这个频道的三个客户端 —— client2 、 client5 和 client1 之间的关系：
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/pubsub1.png)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/pubsub1.png)
 
 当有新消息通过 PUBLISH 命令发送给频道 channel1 时， 这个消息就会被发送给订阅它的三个客户端：
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/pubsub2.png)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/pubsub2.png)
 
 **Redis发布订阅命令**
 
@@ -1530,14 +1530,14 @@ Reading messages... (press Ctrl-C to quit)
 例子示意图：在下图展示的这个 pubsub_channels 示例中， client2 、 client5 和 client1 就订阅了 channel1 ， 而其他频道也分别被别的客户端所订阅。
 ```
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/999593-20190722115529080-190360594.png)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/999593-20190722115529080-190360594.png)
 
 ```bash
 操作：当客户端调用 SUBSCRIBE 命令时， 程序就将客户端和要订阅的频道在 pubsub_channels 字典中关联起来。
 示意图：如果客户端 client10086 执行命令 SUBSCRIBE channel1 channel2 channel3 ，那么前面展示的 pubsub_channels 将变成下面这个样子，通过遍历所有输入频道。
 ```
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/999593-20190722115737561-1282013618.png)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/999593-20190722115737561-1282013618.png)
 
 ```bash
 结论：通过 pubsub_channels 字典， 程序只要检查某个频道是否为字典的键， 就可以知道该频道是否正在被客户端订阅； 只要取出某个键的值， 就可以得到所有订阅该频道的客户端的信息。
@@ -1550,7 +1550,7 @@ Reading messages... (press Ctrl-C to quit)
 例子示意图：对于以下这个 pubsub_channels 实例， 如果某个客户端执行命令 PUBLISH channel1 "hello moto" ，那么 client2 、 client5 和 client1 三个客户端都将接收到 "hello moto" 信息，通过遍历订阅频道的所有客户端。
 ```
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/999593-20190722120719019-733971705.png)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/999593-20190722120719019-733971705.png)
 
 **3、退订频道**
 
@@ -1717,7 +1717,7 @@ Master收到命令，启动后台的存盘进程，同时收集所有接收到�
 
 哨兵模式是一种特殊的模式，首先Redis提供了哨兵的命令，哨兵是一个独立的进程，作为进程，他会独立运行。其原理是哨兵通过发送命令，等待Redis服务器响应，从而监控运行的多个Redis实例。
 
-![img](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/webp)
+![img](https://gitee.com/lafer/laferImage/raw/master/img/webp)
 
 这里的哨兵有两个作用
 
@@ -1726,7 +1726,7 @@ Master收到命令，启动后台的存盘进程，同时收集所有接收到�
 
 然而一个烧饼进程对Redis服务器进行监控，可能会出现问题，因此，可以使用多个哨兵进行监控。各个哨兵之间还会进行监控，这样就形成了多哨兵模式。
 
-![11320039-3f40b17c0412116c](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/11320039-3f40b17c0412116c.webp)
+![11320039-3f40b17c0412116c](https://gitee.com/lafer/laferImage/raw/master/img/11320039-3f40b17c0412116c.webp)
 
 假设主服务器宕机，哨兵1先检测到这个结果，系统并不会马上进行failover过程，仅仅是哨兵1主观的认为主服务器不可用，这个现象称为**主管下线**，当后面的哨兵也检测到主服务器不可用，并且数量达到一定值时，那么哨兵之间就会进行一次投票，投票的结果由一个哨兵发起，进行failover[故障转移]操作。切换成功后，就会通过发布订阅模式，让各个哨兵把自己监控的从服务器实现切换主机，这个过程称为**客观下线**。
 
@@ -1864,7 +1864,7 @@ Redis缓存的作用，极大的提升了应用程序的性能和效率，特别
 
 布隆过滤器是一种数据结构，对所有可能查询的参数以hash形式存储，在控制层先进行校验，不符合则丢弃，从而避免了对底层存储系统的查询压力。
 
-![d788d43f8794a4c2773846a5251e13d3ac6e3910](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/d788d43f8794a4c2773846a5251e13d3ac6e3910.jpeg)
+![d788d43f8794a4c2773846a5251e13d3ac6e3910](https://gitee.com/lafer/laferImage/raw/master/img/d788d43f8794a4c2773846a5251e13d3ac6e3910.jpeg)
 
 ==运用：==
 
@@ -1892,7 +1892,7 @@ Redis的bitmap只支持2^32大小，对应到内存也就是512MB，误判率万
 
 当存储层不命中后，即使返回的空对象也将其缓存起来，同时会设置一个过期时间，之后再访问这个数据将会从缓存中获取，保护了后端数据源
 
-![203fb80e7bec54e7a4ba970397d293564ec26a4d](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/203fb80e7bec54e7a4ba970397d293564ec26a4d.jpeg)
+![203fb80e7bec54e7a4ba970397d293564ec26a4d](https://gitee.com/lafer/laferImage/raw/master/img/203fb80e7bec54e7a4ba970397d293564ec26a4d.jpeg)
 
 这种方式存在两个问题：
 
@@ -1924,7 +1924,7 @@ Redis的bitmap只支持2^32大小，对应到内存也就是512MB，误判率万
 
 缓存雪崩是指，缓存层出现了错误，不能正常工作了。于是所有的请求都会达到存储层，存储层的调用量会暴增，造成存储层也会挂掉的情况。
 
-![9c16fdfaaf51f3dec6606ae3a504f81938297953](redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.images/9c16fdfaaf51f3dec6606ae3a504f81938297953.jpeg)
+![9c16fdfaaf51f3dec6606ae3a504f81938297953](https://gitee.com/lafer/laferImage/raw/master/img/9c16fdfaaf51f3dec6606ae3a504f81938297953.jpeg)
 
 > 解决方案
 
@@ -1935,5 +1935,7 @@ Redis的bitmap只支持2^32大小，对应到内存也就是512MB，误判率万
 **限流降级**
 
 这个解决方案的思想是，在缓存失效后，通过加锁或者队列来控制读数据库写缓存的线程数量。比如对某个key只允许一个线程查询数据和写缓存，其他线程等待。
+
+**数据加热**
 
 数据加热的含义就是在正式部署之前，我先把可能的数据先预先访问一遍，这样部分可能大量访问的数据就会加载到缓存中。在即将发生大并发访问前手动触发加载缓存不同的key，设置不同的过期时间，让缓存失效的时间点尽量均匀。
