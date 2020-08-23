@@ -41,7 +41,7 @@ class Collection {
                 }
             }
             System.out.println(Thread.currentThread().getName() + "消费" + queue.poll() + "号商品");
-            condition.signal();
+            condition.signalAll();
         } finally {
             lock.unlock();
         }
@@ -61,7 +61,7 @@ class Collection {
             int i = random.nextInt(1000);
             System.out.println(Thread.currentThread().getName() + "生产" + i + "号商品");
             queue.add(i);
-            condition.signal();
+            condition.signalAll();
         } finally {
             lock.unlock();
         }
