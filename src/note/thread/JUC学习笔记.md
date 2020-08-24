@@ -171,3 +171,230 @@ class Data1 {
 }
 ```
 
+#### 集合类不安全
+
+> List 不安全
+
+```java
+public static void main(String[] args) {
+    //  不安全
+    //  List<String> list = new ArrayList<>();
+    //  使用Collections提供的安全List
+    //  List<String> list = Collections.synchronizedList(new ArrayList<>());
+    //  Vector安全
+    //  List<String> list = new Vector<>();
+    List<String> list = new CopyOnWriteArrayList<>();
+    //  CopyOnWrite 写入时复制 COW 计算机程序设计领域的一种优化策略
+    for (int i = 0; i < 10; i++) {
+        new Thread(() -> {
+            for (int temp = 0; temp < 10; temp++) {
+                list.add(UUID.randomUUID().toString().substring(0, 32));
+                System.out.println(list);
+            }
+        }).start();
+    }
+    /**
+    写入时复制一个新的数组（数组长度+1），将新的元素放置在数组末尾，然后使用新数组替换原有数组
+    public boolean add(E e) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Object[] elements = getArray();
+            int len = elements.length;
+            Object[] newElements = Arrays.copyOf(elements, len + 1);
+            newElements[len] = e;
+            setArray(newElements);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+    */
+}
+```
+
+> set不安全
+
+```java
+public static void main(String[] args) {
+    //  不安全
+    //  set<String> set = new HashSet<>();
+    //  使用Collections提供的安全Set
+    //  Set<String> set = Collections.synchronizedSet(new HashSet<>());
+    Set<String> set = new CopyOnWriteArraySet<>();
+    for (int i = 0; i < 10; i++) {
+        new Thread(() -> {
+            for (int temp = 0; temp < 10; temp++) {
+                set.add(UUID.randomUUID().toString().substring(0, 32));
+                System.out.println(list);
+            }
+        }).start();
+    }
+}
+```
+
+```java
+// Set 的底层就是 Map
+public HashSet() {
+    map = new HashMap<>();
+}
+// 是不可变的Object对象
+public boolean add(E e) {
+    return map.put(e, PRESENT)==null;
+}
+```
+
+> map不安全
+
+```java
+public static void main(String[] args) {
+    //  Map<String, String> map = new HashMap<>();
+    //  Map<String, String> map = Collections.synchronizedMap(new HashMap<>());
+    Map<String, String> map = new ConcurrentHashMap<>();
+    for (int i = 0; i < 10; i++) {
+        new Thread(() -> {
+            for (int temp = 0; temp < 10; temp++) {
+                map.put(UUID.randomUUID().toString().substring(0, 32), UUID.randomUUID().toString().substring(0, 32));
+                System.out.println(map);
+            }
+        }).start();
+    }
+}
+```
+
+#### Callable
+
+```java
+@FunctionalInterface
+public interface Callable<V> {
+    V call() throws Exception;
+}
+//返回结果并可能引发异常的任务。
+```
+
+```java
+public class CallableTest {
+    public static void main(String[] args) {
+        // 适配器类
+        FutureTask<Integer> integerFutureTask = new FutureTask<>(new MyCallableThread());
+        new Thread(integerFutureTask).start();
+        // 结果会被缓存
+        new Thread(integerFutureTask).start();
+        try {
+            // get 方法可能产生阻塞
+            int ret = integerFutureTask.get();
+            System.out.println(ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+class MyCallableThread implements Callable<Integer> {
+    @Override
+    public Integer call() throws Exception {
+        System.out.println("lafer");
+        int ret = 0;
+        for (int i = 0; i < 100; i++) {
+            ret += i;
+        }
+        return ret;
+    }
+}
+```
+
+**细节：**
+
+1. 有缓存
+2. 结果可能需要等待，会阻塞
+
+#### 常用辅助类
+
+##### CountDownLatch
+
+```java
+// 计数器
+public class CountDownLatchTest {
+    public static void main(String[] args) throws InterruptedException {
+        // 总数是5
+        CountDownLatch countDownLatch = new CountDownLatch(5);
+        for (int i = 0; i < 5; i++) {
+            new Thread(() -> {
+                System.out.println(Thread.currentThread().getName());
+                // 数量 -1
+                countDownLatch.countDown();
+            }, String.valueOf(i)).start();
+        }
+        // 等待计数器归零， 然后再向下执行
+        countDownLatch.await();
+        System.out.println("end");
+    }
+}
+```
+
+原理：
+
+`countDownLatch.countDown();` //数量-1
+
+`countDownLatch.await();`//等待计算器归零，然后再向下执行
+
+每次有线程调用countDown()数量-1，假设计数器变为0，countDownLatch.await()就会被唤醒，继续执行！
+
+##### CyclicBarrier
+
+```java
+public class CyclicBarrierTest {
+    // 十名同学到齐了之后，输出十名同学到齐啦
+    public static void main(String[] args) {
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(10, () -> {
+            System.out.println("十名同学到齐啦。。。");
+        });
+        for (int i = 0; i < 10; i++) {
+            new Thread(() -> {
+                System.out.println(Thread.currentThread().getName() + "报到...");
+                try {
+                    cyclicBarrier.await();  // 等待
+                    System.out.println(Thread.currentThread().getName() + "跑了...");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }, String.valueOf(i)).start();
+        }
+    }
+}
+```
+
+##### Semaphore
+
+```java
+public class SemaphoreTest {
+    // 指定资源个数,多个线程来获取资源
+    public static void main(String[] args) {
+        Semaphore semaphore = new Semaphore(3);
+        for (int i = 0; i < 10; i++) {
+            new Thread(() -> {
+                try {
+                    //获取资源
+                    semaphore.acquire();
+                    System.out.println(Thread.currentThread().getName() + "获取资源");
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    //释放资源
+                    System.out.println(Thread.currentThread().getName() + "释放资源");
+                    semaphore.release();
+                }
+            }, String.valueOf(i)).start();
+        }
+    }
+}
+```
+
+**原理：**
+
+`semaphore.acquire();`获得，如果已经满了，等待，等待被释放为止。
+
+`semaphore.release();`释放，会释放当前的信号量+1，然后唤醒等待的线程。
+
+作用：多个共享资源户次的使用！并发限流，控制最大的线程数。
