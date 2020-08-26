@@ -661,3 +661,120 @@ System.out.println(Runtime.getRuntime().availableProcessors());
 // 2、IO密集型      判断程序中十分耗IO的线程，大于这个数就可以。
 ```
 
+#### 四大函数式接口
+
+> Function
+
+```java
+@FunctionalInterface
+public interface Function<T, R> {
+    R apply(T t);
+}
+
+public void functionTest() {
+    Function<String, String> function = new Function<String, String>() {
+        @Override
+        public String apply(String s) {
+            return "Hello " + s;
+        }
+    };
+    System.out.println(function.apply("la"));
+    Function<String, String> function1 = (s) -> {
+        return "Hello " + s;
+    };
+    System.out.println(function1.apply("lafer"));
+}
+```
+>Predicate
+
+```java
+@FunctionalInterface
+public interface Predicate<T> {
+    boolean test(T t);
+}
+
+private void predicateTest() {
+    Predicate<String> predicate = new Predicate<String>() {
+        @Override
+        public boolean test(String o) {
+            return "lafer".equals(o);
+        }
+    };
+    System.out.println(predicate.test("lafer"));
+    Predicate<String> predicate1 = (s) -> {
+        return "lafer".equals(0);
+    };
+    System.out.println(predicate1.test("123"));
+}
+```
+>Consumer
+
+```java
+@FunctionalInterface
+public interface Consumer<T> {
+    void accept(T t);
+}
+
+private void consumerTest() {
+    Consumer<String> consumer = new Consumer<String>() {
+        @Override
+        public void accept(String s) {
+            System.out.println("consumer " + s);
+        }
+    };
+    consumer.accept("lafer");
+    Consumer<String> consumer1 = (s) -> {
+        System.out.println("consumer " + s);
+    };
+    consumer1.accept("lafer");
+}
+```
+>Supplier
+
+```java
+@FunctionalInterface
+public interface Supplier<T> {
+    T get();
+}
+
+private void supplierTest() {
+    Supplier<String> supplier = new Supplier<String>() {
+        @Override
+        public String get() {
+            return "lafer";
+        }
+    };
+    System.out.println(supplier.get());
+    Supplier<String> supplier1 = () -> {return "lafer";};
+    System.out.println(supplier1.get());
+}
+```
+
+#### Stream流式计算
+
+```java
+/**
+ * 1、ID必须是偶数
+ * 2、年龄必须大于23岁
+ * 3、用户名转为大写字母
+ * 4、只输出一个用户
+ */
+
+public class StreamTest {
+    public static void main(String[] args) {
+        User u1 = new User(1, "a", 21);
+        User u2 = new User(2, "b", 22);
+        User u3 = new User(3, "c", 23);
+        User u4 = new User(4, "d", 24);
+        User u5 = new User(6, "e", 25);
+        List<User> users = Arrays.asList(u1, u2, u3, u4, u5);
+        users.stream()
+                .filter(user -> {return (user.getId() % 2) == 0;})
+                .filter(user -> {return (user.getAge() > 23);})
+                .map((user -> {return user.getName().toUpperCase();}))
+                .sorted((name1, name2) -> {return name2.compareTo(name1);})
+                .limit(1)
+                .forEach(System.out::println);
+    }
+}
+```
