@@ -778,3 +778,128 @@ public class StreamTest {
     }
 }
 ```
+
+#### ForkJoin
+
+![img](https://gitee.com/lafer/laferImage/raw/master/img/42a98226cffc1e17c9adfa158ef74106738de975.jpeg)
+
+从JDK1.7开始，Java提供ForkJoin框架用于并行执行任务，它的思想就是讲一个大任务分割成若干小任务，最终汇总每个小任务的结果得到这个大任务的结果。
+
+> ForkJoinPool
+
+使用ForkJoinPool来执行被细分之后的任务。
+
+ForkJoinPool与其它的ExecutorService区别主要在于它使用“工作窃取“，
+
+**工作窃取**
+
+一个大任务会被划分成无数个小任务，这些任务被分配到不同的队列，这些队列有些干活干的块，有些干得慢。于是干得快的，一看自己没任务需要执行了，就去隔壁的队列里面拿去任务执行。
+
+>ForkJoinTask
+
+ForkJoinTask就是ForkJoinPool里面的每一个任务。他主要有两个子类：RecursiveAction（一个递归无结果的ForkJoinTask）和RecursiveTask（一个递归有结果的ForkJoinTask）。然后通过fork()方法去分配任务执行任务，通过join()方法汇总任务结果。
+
+```java
+public class ForkJoinTest {
+
+    //sum= 500000000500000000 time = 6558
+    public static void test1() {
+        Long sum = 0L;
+        long start = System.currentTimeMillis();
+        for (Long i = 1L; i <= 10_0000_0000; i++) {
+            sum += i;
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("sum= " + sum + " time = " + (end - start));
+    }
+
+    //sum= 500000000500000000 time = 4160
+    public static void test2() throws ExecutionException, InterruptedException {
+        long start = System.currentTimeMillis();
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        ForkJoinTask1 task = new ForkJoinTask1(1L, 10_0000_0000L);
+        ForkJoinTask<Long> submit = forkJoinPool.submit(task);
+        Long sum = submit.get();
+        long end = System.currentTimeMillis();
+        System.out.println("sum= " + sum + " time = " + (end - start));
+    }
+
+    //sum= 500000000500000000 time = 195
+    public static void test3() {
+        long start = System.currentTimeMillis();
+        Long sum = LongStream.rangeClosed(0L, 10_0000_0000L).parallel().reduce(0, Long::sum);
+        long end = System.currentTimeMillis();
+        System.out.println("sum= " + sum + " time = " + (end - start));
+    }
+}
+
+/**
+ * 求和计算任务：
+ *
+ * 如何使用ForkJoin
+ * 1、forkjionpool 来执行
+ * 2、计算任务 forkjoinPool.execute(ForkJoinTask task)
+ * 3、计算类要继承 ForkJoinTask
+ */
+
+class ForkJoinTask1 extends RecursiveTask<Long> {
+    private Long start;
+    private Long end;
+    private Long LJZ = 10000L;
+    public ForkJoinTask1(Long start, Long end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        if (end - start < LJZ) {
+            Long sum = 0L;
+            for (Long i = start; i <= end; i++) {
+                sum += i;
+            }
+            return sum;
+        } else {
+            Long middle = start + (end - start) / 2;
+            // 拆分任务， 把任务压入线程队列
+            ForkJoinTask1 task1 = new ForkJoinTask1(start, middle);
+            ForkJoinTask1 task2 = new ForkJoinTask1(middle + 1, end);
+            task1.fork();
+            task2.fork();
+            // 合并结果
+            return task1.join() + task2.join();
+        }
+    }
+}
+```
+
+#### 异步回调
+
+```java
+public class FutureTest {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+//        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+//            try {
+//                TimeUnit.SECONDS.sleep(2);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println(Thread.currentThread().getName() + " -> " + "runAsync");
+//        });
+//        System.out.println(Thread.currentThread().getName());
+//        completableFuture.get();
+        CompletableFuture<String> stringCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            System.out.println(Thread.currentThread().getName() + " -> " + "supplyAsync");
+            int a = 1 / 0;
+            return "hello world ";
+        });
+        System.out.println(stringCompletableFuture.whenCompleteAsync((a, b) -> {
+            System.out.println(a);
+            System.out.println(b);
+        }).exceptionally((e) -> {
+            System.out.println(e.getMessage());
+            return "500";
+        }).get());
+    }
+}
+```
