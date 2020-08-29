@@ -903,3 +903,473 @@ public class FutureTest {
     }
 }
 ```
+
+#### JMM（Java Memory Model）
+
+Volatile是Java虚拟机提供的轻量级同步机制
+
+1. 保证可见性
+2. 不保证原子性
+3. 禁止指令重排
+
+> 什么是JMM
+
+JMM：Java内存模型（一个概念、约定）
+
+**关于JMM的一些同步约定：**
+
+1、线程加锁前，必须读取主存中的最新之到工作内存中
+
+2、线程解锁前，必须把共享变量立刻刷回主存
+
+3、加锁和解锁是同意一把锁
+
+![1102674-20180815143324915-2024156794](https://gitee.com/lafer/laferImage/raw/master/img/1102674-20180815143324915-2024156794.png)
+
+> 内存交互操作
+
+ 　**内存交互操作有8种，虚拟机实现必须保证每一个操作都是原子的，不可在分的（对于double和long类型的变量来说，load、store、read和write操作在某些平台上允许例外）**
+
+  - lock(锁定)：作用于主内存，它把一个变量标记为一条线程独占状态；
+  - read(读取)：作用于主内存，它把变量值从主内存传送到线程的工作内存中，以便随后的load动作使用；
+  - load(载入)：作用于工作内存，它把read操作的值放入工作内存中的变量副本中；
+  - use(使用)：作用于工作内存，它把工作内存中的值传递给执行引擎，每当虚拟机遇到一个需要使用这个变量的指令时候，将会执行这个动作；
+  - assign(赋值)：作用于工作内存，它把从执行引擎获取的值赋值给工作内存中的变量，每当虚拟机遇到一个给变量赋值的指令时候，执行该操作；
+  - store(存储)：作用于工作内存，它把工作内存中的一个变量传送给主内存中，以备随后的write操作使用；
+  - write(写入)：作用于主内存，它把store传送值放到主内存中的变量中。
+  - unlock(解锁)：作用于主内存，它将一个处于锁定状态的变量释放出来，释放后的变量才能够被其他线程锁定；
+
+**JMM对这八种指令的使用，制定了如下规则：**
+
+ - 不允许read和load、store和write操作之一单独出现。即使用了read必须load，使用了store必须write
+  - 不允许线程丢弃他最近的assign操作，即工作变量的数据改变了之后，必须告知主存
+  - 不允许一个线程将没有assign的数据从工作内存同步回主内存
+  - 一个新的变量必须在主内存中诞生，不允许工作内存直接使用一个未被初始化的变量。就是对变量实施use、store操作之前，必须经过assign和load操作
+  - 一个变量同一时间只有一个线程能对其进行lock。多次lock后，必须执行相同次数的unlock才能解锁
+  - 如果对一个变量进行lock操作，会清空所有工作内存中此变量的值，在执行引擎使用这个变量前，必须重新load或assign操作初始化变量的值
+  - 如果一个变量没有被lock，就不能对其进行unlock操作。也不能unlock一个被其他线程锁住的变量
+  - 对一个变量进行unlock操作之前，必须把此变量同步回主内存
+
+#### Volatile
+
+> 1.可见性验证
+
+```java
+public class Test {
+    private static volatile boolean flag = true;
+    public static void main(String[] args) throws InterruptedException {
+        new Thread(() -> {
+            while (flag) {
+
+            }
+        }).start();
+        TimeUnit.SECONDS.sleep(2);
+        new Thread(() -> {
+            flag = false;
+        }).start();
+    }
+}
+```
+
+> 2.不保证原子性
+
+```java
+public class Test {
+    private static volatile int num = 0;
+
+    private static void add() {
+        num++;
+    }
+
+    private static void test() {
+        for (int i = 0; i < 200; i++) {
+            new Thread(() -> {
+                for (int i1 = 0; i1 < 10000; i1++) {
+                    add();
+                }
+            }).start();
+        }
+        while (Thread.activeCount() > 2) {
+            Thread.yield();
+        }
+        // 结果少于2000000
+        System.out.println(Thread.currentThread().getName() + " " + num);
+    }
+}
+```
+
+lock 和 synchronized可以解决这个问题， 使用原子类也可以。
+
+```java
+public class Test {
+    private static AtomicInteger num = new AtomicInteger(0);
+
+    private static void add() {
+        num.getAndIncrement();
+    }
+
+    private static void test() {
+        for (int i = 0; i < 2000; i++) {
+            new Thread(() -> {
+                for (int i1 = 0; i1 < 10000; i1++) {
+                    add();
+                }
+            }).start();
+        }
+        while (Thread.activeCount() > 2) {
+            Thread.yield();
+        }
+        System.out.println(Thread.currentThread().getName() + " " + num);
+    }
+}
+```
+
+**指令重排**
+
+源代码->编译器优化的重排->指令并行也可能重排->内存系统也会重排->执行
+
+处理器在进行指令重排的时候，考虑：==数据之间的依赖性==
+
+> 3.禁止指令重排
+
+**volatile 可以避免指令重排**
+
+volatile 会在指令的前面和后面分别加一层内存屏障，防止与上面和下面的指令进行指令重排。
+
+#### 单例模式
+
+> 饿汉式
+
+```java
+/**
+ * 饿汉式
+ *
+ * 不管使不使用，都会创建这个对象。
+ *
+ */
+
+public class Hungry {
+
+    // 构造器私有
+    private Hungry() {
+
+    }
+
+    private static final Hungry HUNGRY = new Hungry();
+
+    public static Hungry getInstance() {
+        return HUNGRY;
+    }
+
+}
+```
+
+> 懒汉式
+
+```java
+/**
+ * 懒汉式
+ */
+
+public class Lazy {
+
+    private Lazy() {
+        System.out.println(Thread.currentThread().getName());
+    }
+
+    private static volatile Lazy LAZY;
+
+    // 双重检测锁模式的 懒汉式单例 DCL懒汉式
+    public static Lazy getInstance() {
+        if (LAZY == null) {
+            synchronized (Lazy.class) {
+                if (LAZY == null) {
+                    LAZY = new Lazy();
+                    /**
+                     * LAZY = new Lazy();并不是原子性操作
+                     * 1、分配内存空间
+                     * 2、执行构造方法，初始化对象
+                     * 3、把这个对象指向这个空间
+                     *
+                     * 可能发生指令重排
+                     * 如果A线程执行1、3，b线程判断对象不为null，但是此时对象还没有完成构造，所以需要给对象加上volatile关键字，防止指令重排。
+                     */
+                }
+            }
+        }
+        return LAZY;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 20; i++) {
+            new Thread(() -> {
+                getInstance();
+            }).start();
+        }
+    }
+
+}
+```
+
+**由于反射，懒汉式的单例模式也不安全，可以使用枚举，枚举不支持反射调用构造方法。**
+
+#### 理解CAS
+
+```java
+public class CASTest {
+    public static void main(String[] args) {
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+        System.out.println(atomicInteger.compareAndSet(1, 2));
+        System.out.println(atomicInteger.get());
+        System.out.println(atomicInteger.compareAndSet(1, 2));
+        System.out.println(atomicInteger.get());
+    }
+}
+
+// 源码
+public class AtomicInteger extends Number implements java.io.Serializable {
+    private static final Unsafe unsafe = Unsafe.getUnsafe();
+    private static final long valueOffset;
+    static {
+        try {
+            valueOffset = unsafe.objectFieldOffset
+                (AtomicInteger.class.getDeclaredField("value"));
+        } catch (Exception ex) { throw new Error(ex); }
+    }
+    private volatile int value;
+    public final boolean compareAndSet(int expect, int update) {
+        return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
+    }
+    public final int getAndIncrement() {
+        return unsafe.getAndAddInt(this, valueOffset, 1);
+    }
+}
+public final class Unsafe {
+    public final native boolean compareAndSwapInt(Object var1, long var2, int var4, int var5);
+    public final int getAndAddInt(Object var1, long var2, int var4) {
+        int var5;
+        do {
+            var5 = this.getIntVolatile(var1, var2);
+        } while(!this.compareAndSwapInt(var1, var2, var5, var5 + var4));
+        return var5;
+    }
+}
+```
+
+**CAS（compareAndSet）**：比较工作内存中的值和主存中的值，如果这个值是期望的，那么执行操作，否则一直循环（自旋锁）。
+
+缺点：
+
+1. 循环耗时
+2. 一次性只能保证一个共享变量的原子性
+3. ABA问题
+
+> CAS：ABA问题
+
+描述：线程A在执行CAS(1, 2)之前，线程执行了CAS(1, 3); CAS(3, 1)。对于线程A而言，是不知道共享变量已经发生过修改了的。
+
+```java
+public class ABATest {
+    private static AtomicInteger atomicInteger = new AtomicInteger(0);
+
+    public static void main(String[] args) {
+        new Thread(() -> {
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.get());
+            try {
+                TimeUnit.SECONDS.sleep(2);
+                System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(0, 1));
+                System.out.println(Thread.currentThread().getName() + " " + atomicInteger.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.get());
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(0, 2));
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(2, 0));
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.get());
+        }).start();
+    }
+}
+```
+
+解决方案：原子引用
+
+#### 原子引用
+
+```java
+public class ABATest {
+    //AtomicStampedReference 注意，如果泛型是一个整型包装类，注意对象引用问题，比较的是两个对象的引用，
+    private static AtomicStampedReference<Integer> atomicInteger = new AtomicStampedReference(0, 1);
+    public static void main(String[] args) {
+        new Thread(() -> {
+            int stamp = atomicInteger.getStamp();
+            try {
+                TimeUnit.SECONDS.sleep(2);
+                System.out.println(Thread.currentThread().getName() + " " + stamp);
+                System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(0, 1, stamp, stamp + 1));
+                System.out.println(Thread.currentThread().getName() + " " + atomicInteger.getStamp());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            int stamp = atomicInteger.getStamp();
+            System.out.println(Thread.currentThread().getName() + " " + stamp);
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(0, 2, stamp, stamp + 1));
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.compareAndSet(2, 1, stamp + 1, stamp + 2));
+            System.out.println(Thread.currentThread().getName() + " " + atomicInteger.getStamp());
+        }).start();
+    }
+}
+```
+
+![image-20200829232556528](https://gitee.com/lafer/laferImage/raw/master/img/image-20200829232556528.png)
+
+#### 各种锁的理解
+
+##### 1、公平锁
+
+先来先得，必须排队
+
+##### 2、非公平锁
+
+可以插队
+
+##### 3、可重入锁
+
+什么是 “可重入”，可重入就是说某个线程已经获得某个锁，可以再次获取锁而不会出现死锁
+
+##### 4、自旋锁
+
+```java
+public final int getAndAddInt(Object var1, long var2, int var4) {
+    int var5;
+    do {
+        var5 = this.getIntVolatile(var1, var2);
+    } while(
+        !this.compareAndSwapInt(var1, var2, var5, var5 + var4));
+    return var5;
+}
+```
+```java
+public class SpinLockTest {
+
+    AtomicReference<Thread> atomicReference = new AtomicReference<>();
+
+    public void myLock() {
+        System.out.println(Thread.currentThread().getName() + " - myLock");
+        while (atomicReference.compareAndSet(null, Thread.currentThread())) {
+
+        }
+    }
+
+    public void myUnLock() {
+        System.out.println(Thread.currentThread().getName() + " - myUnLock");
+        atomicReference.compareAndSet(Thread.currentThread(), null);
+    }
+
+    public static void main(String[] args) {
+        SpinLockTest spinLockTest = new SpinLockTest();
+        new Thread(() -> {
+            try {
+                spinLockTest.myLock();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                spinLockTest.myUnLock();
+            }
+        }, "A").start();
+        new Thread(() -> {
+            try {
+                spinLockTest.myLock();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                spinLockTest.myUnLock();
+            }
+        }, "B").start();
+    }
+    
+}
+```
+
+#### 死锁
+
+死锁的排查
+
+```java
+public class DeadLock {
+
+    Lock lockA = new ReentrantLock();
+
+    Lock lockB = new ReentrantLock();
+
+    public void getLockAB() {
+        lockA.lock();
+        try {
+            System.out.println(Thread.currentThread().getName() + " get lockA ");
+            TimeUnit.SECONDS.sleep(2);
+            lockB.lock();
+            try {
+                System.out.println(Thread.currentThread().getName() + " get lockB ");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lockB.unlock();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lockA.unlock();
+        }
+    }
+
+    public void getLockBA() {
+        lockB.lock();
+        try {
+            System.out.println(Thread.currentThread().getName() + " get lockA ");
+            TimeUnit.SECONDS.sleep(2);
+            lockA.lock();
+            try {
+                System.out.println(Thread.currentThread().getName() + " get lockB ");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lockA.unlock();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lockB.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        DeadLock deadLock = new DeadLock();
+        new Thread(() -> {
+            deadLock.getLockAB();
+        }, "Thread1").start();
+        new Thread(() -> {
+            deadLock.getLockBA();
+        }, "Thread2").start();
+    }
+
+}
+```
+
+> 解决问题
+
+1.使用`jps -l`定位进程号
+
+![微信截图_20200830000630](https://gitee.com/lafer/laferImage/raw/master/img/微信截图_20200830000630.png)
+
+2.使用`jstack 进程号`找到死锁问题
+
+![image-20200830000935710](https://gitee.com/lafer/laferImage/raw/master/img/image-20200830000935710.png)
+
+排查问题：
+
+1、日志
+
+2、堆栈信息
