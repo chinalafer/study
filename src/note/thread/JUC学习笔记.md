@@ -42,7 +42,7 @@ public enum State {
 >wait/sleep区别
 
 - wait在多线程通信中使用，使用之前需要先获得对象的锁，调用wait之后会释放锁，被其他线程调用notify唤醒之后进入就绪状态接着执行。wait是一个object方法。
-- sleep使当前线程休眠指定时间之后，进入就绪状态。休眠过程中，不会释放锁，Thrad类方法。
+- sleep使当前线程休眠指定时间之后，进入就绪状态。休眠过程中，不会释放锁，Thread类方法。
 
 #### Lock锁
 
@@ -470,11 +470,11 @@ class MyCache {
 
 **四组API**
 
-| 方式       | 抛出异常 | 有返回值 | 阻塞等待 | 超市等待  |
-| ---------- | -------- | -------- | -------- | --------- |
-| 添加       | add      | offer()  | put      | offer(,,) |
-| 移除       | remove   | poll()   | take     | poll(,)   |
-| 判断队列首 | element  | peek()   |          |           |
+| 方式       | 抛出异常 | 有返回值 | 阻塞等待 | 超时间等待 |
+| ---------- | -------- | -------- | -------- | ---------- |
+| 添加       | add      | offer()  | put      | offer(,,)  |
+| 移除       | remove   | poll()   | take     | poll(,)    |
+| 判断队列首 | element  | peek()   |          |            |
 
 >SynchronousQueue
 
@@ -595,7 +595,7 @@ public ThreadPoolExecutor(int corePoolSize,
 }
 public ThreadPoolExecutor(int corePoolSize,			// 核心线程数
                           int maximumPoolSize,		// 最大线程数
-                          long keepAliveTime,		// 非核心线程，多久没使用了之后关闭
+                          long keepAliveTime,		// 当线程数大于核心线程数时，多余的空闲线程存活的最长时间
                           TimeUnit unit,			// 单位
                           BlockingQueue<Runnable> workQueue,// 等待队列
                           ThreadFactory threadFactory,		// 创建线程工程
@@ -922,7 +922,7 @@ JMM：Java内存模型（一个概念、约定）
 
 2、线程解锁前，必须把共享变量立刻刷回主存
 
-3、加锁和解锁是同意一把锁
+3、加锁和解锁是同一把锁
 
 ![1102674-20180815143324915-2024156794](https://gitee.com/lafer/laferImage/raw/master/img/1102674-20180815143324915-2024156794.png)
 
