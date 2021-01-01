@@ -1,7 +1,5 @@
 package com.lafer.leetcode.string;
 
-import java.util.Arrays;
-
 /**
  *
  * 205. 同构字符串
@@ -30,6 +28,8 @@ import java.util.Arrays;
  * 思考：
  * 1、记录字符出现的次数，然后排序比较（错误）无法比较 "aba" "bba" 这种情况
  * 2、记录字符上次出现的位置，如果字符上次出现的位置都相同，则是同构。
+ * 3、记录字符串s中的字符需要被替换的字符，如果不存在，则是第一次判断，设置被替换的目标字符，如果存在，则判断该位置的目标字符是否与记录的相同，相同继续比较不相同返回false
+ *
  */
 
 public class LeetCode205 {
@@ -44,6 +44,25 @@ public class LeetCode205 {
             }
             sPreIndex[cs] = i + 1;
             sPreIndex[ts] = i + 1;
+        }
+        return true;
+    }
+
+    public boolean isIsomorphic1(String s, String t) {
+        int[] shash = new int[256];
+        int[] thash = new int[256];
+        for (int i = 0; i < s.length(); i++) {
+            if (shash[s.charAt(i)] == 0) {
+                shash[s.charAt(i)] = t.charAt(i);
+                if (thash[t.charAt(i)] != 0) {
+                    return false;
+                }
+                thash[t.charAt(i)] = s.charAt(i);
+            } else {
+                if (shash[s.charAt(i)] != t.charAt(i)) {
+                    return false;
+                }
+            }
         }
         return true;
     }

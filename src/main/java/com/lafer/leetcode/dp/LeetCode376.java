@@ -48,7 +48,7 @@ package com.lafer.leetcode.dp;
  * 初始化：down[0] = 1;up[0] = 1;
  * 结果：Math.max(up[n - 1], down[n - 1]);
  * 状态压缩：由于每次只用到了之前的一个状态，可以直接使用两个常数up、down表示即可。
- * 时间复杂度：O(n * n)
+ * 时间复杂度：O(n)
  * 空间复杂度：O(1)
  */
 

@@ -1,4 +1,4 @@
-package com.lafer.leetcode;
+package com.lafer.leetcode.greed;
 
 /**
  *
@@ -31,7 +31,20 @@ package com.lafer.leetcode;
 public class LeetCode376 {
 
     public int wiggleMaxLength(int[] nums) {
-        return 0;
+        // 贪心，记录峰 谷 的数量便是答案
+        if (nums.length < 2) {
+            return nums.length;
+        }
+        int preSub = nums[1] - nums[0];
+        int ret = preSub == 0 ? 1 : 2;
+        for (int i = 2; i < nums.length; i++) {
+            int curSub = nums[i] - nums[i - 1];
+            if (curSub < 0 && preSub >= 0 || curSub > 0 && preSub <= 0) {
+                preSub = curSub;
+                ret++;
+            }
+        }
+        return ret;
     }
 
 }
